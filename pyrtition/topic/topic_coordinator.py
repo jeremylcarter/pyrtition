@@ -1,17 +1,18 @@
 import random
 from queue import Queue
 from threading import RLock
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Callable
 
-from topic.topic_partition import TopicPartition
-from topic.topic_partition_capacity import TopicPartitionCapacity
+from pyrtition.topic.topic_message import TopicMessage
+from pyrtition.topic.topic_partition import TopicPartition
+from pyrtition.topic.topic_partition_capacity import TopicPartitionCapacity
 
 
 class TopicCoordinator:
     name: str
     max_partition_count: int
 
-    _partitions: Dict[int, TopicPartition]
+    partitions: Dict[int, TopicPartition]
     _producer_cache: Dict[str, int]
     _lock: RLock
 
@@ -28,7 +29,7 @@ class TopicCoordinator:
             self.__create_partition(i + 1)
 
     def __create_partition(self, number: int) -> bool:
-        partition = TopicPartition(number)
+        partition = TopicPartition(self.name, number)
         self.partitions[number] = partition
         return True
 
@@ -60,8 +61,11 @@ class TopicCoordinator:
             return capacities[0].number
         else:
             # Pick a random low capacity topic
-            next_available_random = random.randint(0, 3)
-            return capacities[next_available_random].number
+            try:
+                next_available_random = random.randint(0, 3)
+                return capacities[next_available_random].number
+            except:
+                return capacities[0].number
 
     def get_producer_partition(self, producer_name: str) -> int:
         if producer_name in self.producer_cache:
@@ -97,3 +101,11 @@ class TopicCoordinator:
     def get_capacity(self) -> List[TopicPartitionCapacity]:
         return list([TopicPartitionCapacity(partition.number, partition.producer_count)
                      for partition in self.partitions.values()])
+
+    def start_consuming(self, on_message: Callable[[TopicMessage, int, int], None] = None):
+        for partition in self.partitions.values():
+            partition.start_consuming(on_message)
+
+    def stop_consuming(self):
+        for partition in self.partitions.values():
+            partition.stop_consuming()

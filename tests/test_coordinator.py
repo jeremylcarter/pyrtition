@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from coordinator import Coordinator
+from pyrtition.coordinator import Coordinator
 
 
 class TestCoordinator(TestCase):

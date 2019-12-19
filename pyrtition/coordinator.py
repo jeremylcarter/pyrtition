@@ -1,9 +1,9 @@
 from queue import Queue
 from threading import RLock
-from typing import Dict
+from typing import Dict, Callable
 
-from consumer.threaded_topic_consumer import ThreadedTopicConsumer
-from topic.topic_coordinator import TopicCoordinator
+from pyrtition.topic.topic_coordinator import TopicCoordinator
+from pyrtition.topic.topic_message import TopicMessage
 
 
 class Coordinator:
@@ -18,12 +18,14 @@ class Coordinator:
     def get_or_create_topic(self, topic_name: str, max_partition_count: int = 4) -> TopicCoordinator:
         if topic_name in self.topics:
             return self.topics[topic_name]
+        new_topic: TopicCoordinator
         try:
             self._lock.acquire()
             new_topic = TopicCoordinator(topic_name, max_partition_count)
             self.topics[topic_name] = new_topic
         finally:
             self._lock.release()
+        return new_topic
 
     def publish(self, topic_name, producer_name, value: any) -> bool:
         topic = self.get_or_create_topic(topic_name)
@@ -33,5 +35,9 @@ class Coordinator:
         topic = self.get_or_create_topic(topic_name)
         return topic.get_queue(partition)
 
-    def create_threaded_consumer(self, topic_name: str) -> ThreadedTopicConsumer:
-        return ThreadedTopicConsumer.from_topic_name(self, topic_name)
+    def create_and_start_consuming(self, topic_name: str, max_partition_count: int = 4,
+                                   on_message: Callable[[TopicMessage, int, int], None] = None) -> TopicCoordinator:
+        topic = self.get_or_create_topic(topic_name, max_partition_count)
+        if on_message:
+            topic.start_consuming(on_message)
+        return topic

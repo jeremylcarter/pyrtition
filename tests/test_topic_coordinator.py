@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from topic.topic_coordinator import TopicCoordinator
+from pyrtition.topic.topic_coordinator import TopicCoordinator
 
 
 class TestTopicCoordinator(TestCase):
