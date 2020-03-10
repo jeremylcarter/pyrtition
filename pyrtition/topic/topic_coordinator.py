@@ -50,6 +50,10 @@ class TopicCoordinator:
         # Sort them in descending order
         capacities.sort(key=lambda c: c.producers)
 
+        # If there is only 1 available then just return it
+        if len(capacities) == 1:
+            return capacities[0].number
+
         # Pick the next available zero capacity partition
         next_available_zero_capacity = next((c for c in capacities if c.producers == 0), None)
         if next_available_zero_capacity is not None:
@@ -61,11 +65,12 @@ class TopicCoordinator:
             return capacities[0].number
         else:
             # Pick a random low capacity topic
-            try:
-                next_available_random = random.randint(0, 3)
+            next_available_random = random.randint(0, 3)
+            if len(capacities) <= next_available_random:
                 return capacities[next_available_random].number
-            except:
-                return capacities[0].number
+
+        # As a last resort just return the first partition
+        return capacities[0].number
 
     def get_producer_partition(self, producer_name: str) -> int:
         if producer_name in self.producer_cache:

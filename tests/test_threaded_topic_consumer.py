@@ -1,14 +1,13 @@
 import time
 from unittest import TestCase
 
-from pyrtition.consumer.threaded_topic_consumer import ThreadedTopicConsumer
 from pyrtition.topic.topic_coordinator import TopicCoordinator
 from pyrtition.topic.topic_message import TopicMessage
 
 
 class TestThreadedTopicConsumer(TestCase):
     def test_start(self):
-        topic_coordinator = TopicCoordinator("test", 1)
+        topic_coordinator = TopicCoordinator("test", 4)
         topic_coordinator.start_consuming(on_message)
 
         producers = 10

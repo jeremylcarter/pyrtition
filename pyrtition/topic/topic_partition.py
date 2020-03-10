@@ -7,7 +7,7 @@ from pyrtition.topic.topic_message import TopicMessage
 
 
 class TopicPartition:
-    name: str
+    topic_name: str
     number: int
     producer_count: int
     producers: Set[str]
@@ -16,7 +16,7 @@ class TopicPartition:
     _consumer_thread: Any = None
 
     def __init__(self, name: str, number: int):
-        self.name = name
+        self.topic_name = name
         self.number = number
         self.producer_count = 0
         self.producers = set()
@@ -56,10 +56,6 @@ class TopicPartition:
         if self._consumer_thread:
             self._consumer_thread.notify()
 
-    def stop_consuming(self):
-        if self._consumer_thread:
-            self._consumer_thread.stop()
-
     def start_consuming(self, on_message: Callable[[TopicMessage, int, int], None] = None):
         # We can only consume if we have an on_message callable
         if not on_message:
@@ -69,3 +65,7 @@ class TopicPartition:
         consumer_thread = TopicPartitionConsumerThread(self, on_message)
         consumer_thread.start()
         self._consumer_thread = consumer_thread
+
+    def stop_consuming(self):
+        if self._consumer_thread:
+            self._consumer_thread.stop()

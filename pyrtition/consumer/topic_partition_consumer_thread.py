@@ -1,5 +1,4 @@
 import threading
-import time
 from queue import Queue
 from typing import Callable, cast, Optional
 
@@ -22,7 +21,7 @@ class TopicPartitionConsumerThread(threading.Thread):
                  on_message: Optional[Callable[[TopicMessage, int, int], None]] = None):
         super(TopicPartitionConsumerThread, self).__init__()
         self.setDaemon(True)
-        self.setName(f"{topic_partition.name}-{topic_partition.number}")
+        self.setName(f"{topic_partition.topic_name}-{topic_partition.number}")
         self._signal = threading.Condition()
         self._topic_partition = topic_partition
         self._queue = topic_partition.get_queue()
@@ -36,11 +35,11 @@ class TopicPartitionConsumerThread(threading.Thread):
             with self._signal:
                 self._signal.notify()
         except RuntimeError as ex:
+            # We have tried to notify the signal when it is being re-acquired
             pass
 
     def run(self) -> None:
         self.thread_id = threading.get_ident()
-        print(f"Running thread {self.name} ({self.thread_id})")
         self.running = True
 
         while self.running:
@@ -60,3 +59,4 @@ class TopicPartitionConsumerThread(threading.Thread):
 
     def stop(self):
         self.running = False
+
