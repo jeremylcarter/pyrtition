@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pyrtition",
-    version="1.0",
+    version="1.0.1",
     packages=find_packages(exclude="tests"),
     license='MIT',
     author='Jeremy Carter',
