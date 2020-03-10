@@ -1,4 +1,3 @@
-from threading import Thread
 from typing import Dict, Callable
 
 from pyrtition.consumer.topic_partition_consumer_thread import TopicPartitionConsumerThread
