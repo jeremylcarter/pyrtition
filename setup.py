@@ -9,4 +9,5 @@ setup(
     author='Jeremy Carter',
     author_email='jeremychild@gmail.com',
     python_requires='>=3.6',
+    url="https://github.com/jeremylcarter/pyrtition"
 )
