@@ -56,13 +56,13 @@ class TopicPartition:
         if self._consumer_thread:
             self._consumer_thread.notify()
 
-    def start_consuming(self, on_message: Callable[[TopicMessage, int, int], None] = None):
+    def start_consuming(self, on_message: Callable[[TopicMessage, int, int], None] = None, use_signals: bool = False):
         # We can only consume if we have an on_message callable
         if not on_message:
             return
 
         from pyrtition.consumer.topic_partition_consumer_thread import TopicPartitionConsumerThread
-        consumer_thread = TopicPartitionConsumerThread(self, on_message)
+        consumer_thread = TopicPartitionConsumerThread(self, on_message, use_signals)
         consumer_thread.start()
         self._consumer_thread = consumer_thread
 

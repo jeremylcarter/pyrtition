@@ -107,9 +107,9 @@ class TopicCoordinator:
         return list([TopicPartitionCapacity(partition.number, partition.producer_count)
                      for partition in self.partitions.values()])
 
-    def start_consuming(self, on_message: Callable[[TopicMessage, int, int], None] = None):
+    def start_consuming(self, on_message: Callable[[TopicMessage, int, int], None] = None, use_signals: bool = False):
         for partition in self.partitions.values():
-            partition.start_consuming(on_message)
+            partition.start_consuming(on_message, use_signals)
 
     def stop_consuming(self):
         for partition in self.partitions.values():
