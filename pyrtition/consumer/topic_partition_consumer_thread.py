@@ -1,6 +1,7 @@
 import threading
+import logging
 from queue import Queue
-from typing import Callable, cast, Optional
+from typing import Callable, Optional
 
 from pyrtition.topic.topic_message import TopicMessage
 from pyrtition.topic.topic_partition import TopicPartition
@@ -58,8 +59,7 @@ class TopicPartitionConsumerThread(threading.Thread):
                 try:
                     self._on_message(message, self.number, self.thread_id)
                 except Exception as ex:
-                    # TODO add logging
-                    print(ex)
+                    logging.exception(ex)
                     pass
             self._queue.task_done()
 
@@ -74,9 +74,10 @@ class TopicPartitionConsumerThread(threading.Thread):
                     try:
                         self._on_message(message, self.number, self.thread_id)
                     except Exception as ex:
-                        # TODO add logging
+                        logging.exception(ex)
                         pass
             finally:
+                self._queue.task_done()
                 self._signal.release()
 
     def stop(self):
