@@ -66,10 +66,10 @@ class TopicCoordinator:
             if pick_lowest:
                 return capacities[0].number
             else:
-                # Pick a random low capacity topic
-                next_available_random = random.randint(0, 3)
-                if len(capacities) <= next_available_random:
-                    return capacities[next_available_random].number
+                # Pick a random partition
+                random_index = random.randint(0, (len(capacities) - 1))
+                if random_index < len(capacities):
+                    return capacities[random_index].number
 
             # As a last resort just return the first partition
             return capacities[0].number
